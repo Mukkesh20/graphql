@@ -8,6 +8,7 @@
         "assetsdata",
         "assettype",
         "assettypes",
-        "graphiql"
+        "graphiql",
+        "stockcode"
     ]
 }

@@ -21,8 +21,13 @@ const AssetDataType = new GraphQLObjectType({
         id: { type: GraphQLID },
         subtype: { type: new GraphQLNonNull(GraphQLString) },
         name: { type: new GraphQLNonNull(GraphQLString) },
-        invested: { type: new GraphQLNonNull(GraphQLInt) },
-        value: { type: new GraphQLNonNull(GraphQLInt) },
+        code: { type: new GraphQLNonNull(GraphQLString)},
+        risk: { type: new GraphQLNonNull(GraphQLString)},
+        units: { type: new GraphQLNonNull(GraphQLInt)},
+        avgPrice: { type: new GraphQLNonNull(GraphQLFloat)},
+        invested: { type: new GraphQLNonNull(GraphQLFloat) },
+        currentPrice: { type: new GraphQLNonNull(GraphQLFloat)},
+        value: { type: new GraphQLNonNull(GraphQLFloat) },
         type: { type: new GraphQLNonNull(GraphQLString) },
     })
 });
@@ -82,16 +87,26 @@ const Mutation = new GraphQLObjectType({
             type: AssetDataType,
             args: { 
                 type: { type: new GraphQLNonNull(GraphQLString)},
-                subtype: { type: new GraphQLNonNull(GraphQLString)},
-                name: { type: new GraphQLNonNull(GraphQLString)},
-                invested: { type: new GraphQLNonNull(GraphQLInt)},
-                value: { type: new GraphQLNonNull(GraphQLInt)},
+                subtype: { type: new GraphQLNonNull(GraphQLString) },
+                name: { type: new GraphQLNonNull(GraphQLString) },
+                code: { type: new GraphQLNonNull(GraphQLString)},
+                risk: { type: new GraphQLNonNull(GraphQLString)},
+                units: { type: new GraphQLNonNull(GraphQLInt)},
+                avgPrice: { type: new GraphQLNonNull(GraphQLFloat)},
+                invested: { type: new GraphQLNonNull(GraphQLFloat) },
+                currentPrice: { type: new GraphQLNonNull(GraphQLFloat)},
+                value: { type: new GraphQLNonNull(GraphQLFloat) },
             },
             resolve(parent, args){
               let assetData = new AssetDataModel({
                 type: args.type,
                 subtype: args.subtype,
                 name: args.name,
+                code: args.code,
+                risk: args.risk,
+                units: args.units,
+                avgPrice: args.avgPrice,
+                currentPrice: args.currentPrice,
                 invested: args.invested,
                 value: args.value,
               });
@@ -110,7 +125,68 @@ const Mutation = new GraphQLObjectType({
               });
               return assetType.save();
             }
-        }
+        },
+        updateAssetData: {
+            type: AssetDataType,
+            args: {
+                id: { type: new GraphQLNonNull(GraphQLID)},
+                type: { type: new GraphQLNonNull(GraphQLString)},
+                subtype: { type: new GraphQLNonNull(GraphQLString) },
+                name: { type: new GraphQLNonNull(GraphQLString) },
+                code: { type: new GraphQLNonNull(GraphQLString)},
+                risk: { type: new GraphQLNonNull(GraphQLString)},
+                units: { type: new GraphQLNonNull(GraphQLInt)},
+                avgPrice: { type: new GraphQLNonNull(GraphQLFloat)},
+                invested: { type: new GraphQLNonNull(GraphQLFloat) },
+                currentPrice: { type: new GraphQLNonNull(GraphQLFloat)},
+                value: { type: new GraphQLNonNull(GraphQLFloat) },
+            },
+            resolve(parent, args) {
+              return AssetDataModel.findByIdAndUpdate(args.id, { type: args.type, subtype:args.subtype, name: args.name, invested: args.invested, value: args.value}, function (err) {
+                if (err) return next(err);
+              });
+            }
+          },
+          updateAssetType: {
+            type: AssetType,
+            args: {
+                id: { type: new GraphQLNonNull(GraphQLID)},
+                name: { type: new GraphQLNonNull(GraphQLString)},
+            },
+            resolve(parent, args) {
+              return AssetTypeModel.findByIdAndUpdate(args.id, { name: args.name}, function (err) {
+                if (err) return next(err);
+              });
+            }
+          },
+          removeAssetData: {
+            type: AssetDataType,
+            args: {
+              id: {
+                type: new GraphQLNonNull(GraphQLID)
+              }
+            },
+            resolve(parent, args) {
+              const remAssetData = AssetDataModel.findByIdAndRemove(args.id).exec();
+              if (!remAssetData) {
+                throw new Error('Error')
+              }
+              return remAssetData;
+            }
+          },
+          removeAssetType: {
+            type: AssetType,
+            args: {
+              id: {type: new GraphQLNonNull(GraphQLID)}
+            },
+            resolve(parent, args) {
+              const remAssetData = AssetTypeModel.findByIdAndRemove(args.id).exec();
+              if (!remAssetData) {
+                throw new Error('Error')
+              }
+              return remAssetData;
+            }
+          }
     }
 });
 
