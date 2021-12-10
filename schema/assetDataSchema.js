@@ -28,7 +28,7 @@ const AssetDataType = new GraphQLObjectType({
         invested: { type: new GraphQLNonNull(GraphQLFloat) },
         currentPrice: { type: new GraphQLNonNull(GraphQLFloat)},
         value: { type: new GraphQLNonNull(GraphQLFloat) },
-        type: { type: new GraphQLNonNull(GraphQLString) },
+        type: { type: new GraphQLNonNull(GraphQLString) } ,
     })
 });
 
